@@ -11,6 +11,7 @@ class CalendarClient {
     scopes: <String>[CalendarApi.calendarScope],
   );
   //skatl7ojujo3up6mqqsnjik3e8
+
   void insert(Event event) async {
     GoogleSignInAccount? account = (await googleSignIn.signIn());
 
@@ -23,7 +24,7 @@ class CalendarClient {
     log.i(
         "user state ${authClient!.credentials.accessToken} ${authClient.credentials.idToken} ${authClient.credentials.scopes}");
 
-    final CalendarApi googleCalendarApi = CalendarApi(authClient!);
+    final CalendarApi googleCalendarApi = CalendarApi(authClient);
 
     try {
       googleCalendarApi.events
@@ -32,7 +33,7 @@ class CalendarClient {
         if (value.status == "confirmed") {
           log.i('Event added in google calendar');
           log.i(value.id);
-          log.i("conf data ${value.conferenceData!.entryPoints![0].uri} ");
+          log.i("meet url ${value.conferenceData!.entryPoints![0].uri} ");
         } else {
           log.i("Unable to add event in google calendar");
         }
@@ -69,6 +70,52 @@ class CalendarClient {
       return null;
     } catch (err) {
       log.i('Error getting event: $err');
+    }
+  }
+
+  void delete(String id) async {
+    GoogleSignInAccount? account = (await googleSignIn.signIn());
+
+    if (account != null) {
+      log.i("user logged in ${account.email}");
+    }
+
+    AuthClient? authClient = await googleSignIn.authenticatedClient();
+
+    final CalendarApi googleCalendarApi = CalendarApi(authClient!);
+
+    try {
+      googleCalendarApi.events.delete("primary", id);
+    } catch (err) {
+      log.i('Error deleting event: $err');
+    }
+  }
+
+  void update(String id, Event event) async {
+    GoogleSignInAccount? account = (await googleSignIn.signIn());
+
+    if (account != null) {
+      log.i("user logged in ${account.email}");
+    }
+
+    AuthClient? authClient = await googleSignIn.authenticatedClient();
+
+    final CalendarApi googleCalendarApi = CalendarApi(authClient!);
+
+    try {
+      googleCalendarApi.events
+          .update(event, "primary", id, conferenceDataVersion: 1)
+          .then((value) {
+        if (value.status == 'confirmed') {
+          log.i('event updated successfully');
+          log.i(value.id);
+          log.i('meet link is ${value.conferenceData!.entryPoints![0].uri}');
+        } else {
+          log.i('error in updating data');
+        }
+      });
+    } catch (e) {
+      log.i("exception in update ${e.toString()}");
     }
   }
 }

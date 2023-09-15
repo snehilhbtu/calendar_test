@@ -106,16 +106,18 @@ class _FormPageState extends State<FormPage> {
       end: EventDateTime(dateTime: end, timeZone: end!.timeZoneName),
       conferenceData: ConferenceData(
         createRequest: CreateConferenceRequest(
-          requestId: uid.v4(),
+          requestId: /*'adnsfjiwejksvmskvmklsmvks'*/ uid.v4(),
         ),
       ),
       recurrence: recurrenceList,
     );
 
-    CalendarClient().insert(event);
+    //CalendarClient().insert(event);
+    CalendarClient().update("67eacisvhmafta497tt3f2iago", event);
+    //CalendarClient().get("");
+    //CalendarClient().delete("mndd52ngn0fpk83l06plhoqv0s");
   }
 
-  @override
   @override
   Widget build(BuildContext context) {
     log.i(
